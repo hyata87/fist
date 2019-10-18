@@ -3,7 +3,6 @@ package info.gravitypianist.fist.base.model;
 import info.gravitypianist.fist.base.Model;
 import info.gravitypianist.fist.base.Observer;
 import info.gravitypianist.fist.base.Resource;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -12,124 +11,54 @@ import static org.mockito.Mockito.*;
 public class DefaultModelTest {
 
     @Test
-    public void test() {
-
+    public void Dispatch_SendActions_ReceivedResources() {
         SampleActionMapping actionMapping = mock(SampleActionMapping.class);
+        when(actionMapping.invoke(any())).thenReturn(mock(Sample.class));
+
         SampleErrorMapping errorMapping = mock(SampleErrorMapping.class);
 
-        when(actionMapping.invoke(any())).thenReturn(mock(Sample.class));
-        when(actionMapping.invoke(any(), any())).thenReturn(mock(Sample.class));
+        Model<SampleAction, Sample, SampleError> model = DefaultModel.create(actionMapping, errorMapping);
 
-        Model<SampleAction, Sample, SampleError> sampleModel = DefaultModel.create(
-                actionMapping,
-                errorMapping
-        );
+        SampleResourceObserver observer = mock(SampleResourceObserver.class);
+        model.setResourceObserver(observer);
 
-        SampleResourceObserver resourceObserver = mock(SampleResourceObserver.class);
+        model.dispatch(SampleAction.ACTION1);
+        model.dispatch(SampleAction.ACTION2);
+        model.dispatch(SampleAction.ACTION3);
 
-        sampleModel.setResourceObserver(resourceObserver);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        sampleModel.dispatch(SampleAction.ACTION1);
-        sampleModel.dispatch(SampleAction.ACTION2);
-        sampleModel.dispatch(SampleAction.ACTION3);
-
-        InOrder actionOrder = inOrder(actionMapping);
-
-        actionOrder.verify(actionMapping).invoke(SampleAction.ACTION1);
-        actionOrder.verify(actionMapping).invoke(eq(SampleAction.ACTION2), any());
-        actionOrder.verify(actionMapping).invoke(eq(SampleAction.ACTION3), any());
-
-        InOrder resourceOrder = inOrder(resourceObserver);
-
-        resourceOrder.verify(resourceObserver).update(isA(Resource.InProgress.class));
-        resourceOrder.verify(resourceObserver).update(isA(Resource.Success.class));
-        resourceOrder.verify(resourceObserver).update(isA(Resource.InProgress.class));
-        resourceOrder.verify(resourceObserver).update(isA(Resource.Success.class));
-        resourceOrder.verify(resourceObserver).update(isA(Resource.InProgress.class));
-        resourceOrder.verify(resourceObserver).update(isA(Resource.Success.class));
-
+        InOrder order = inOrder(observer);
+        order.verify(observer).update(isA(Resource.InProgress.class));
+        order.verify(observer).update(isA(Resource.Success.class));
+        order.verify(observer).update(isA(Resource.InProgress.class));
+        order.verify(observer).update(isA(Resource.Success.class));
+        order.verify(observer).update(isA(Resource.InProgress.class));
+        order.verify(observer).update(isA(Resource.Success.class));
     }
 
-    enum SampleAction {
+    private enum SampleAction {
         ACTION1,
         ACTION2,
         ACTION3
     }
 
-    static class Sample {
-
-        private String title;
-        private String decs;
-
-        Sample(String title, String decs) {
-            this.title = title;
-            this.decs = decs;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getDecs() {
-            return decs;
-        }
-
-        public void setDecs(String decs) {
-            this.decs = decs;
-        }
-
+    private static class Sample {
     }
 
-    static class SampleError extends Throwable {
-
-        static class NoError extends SampleError {
-
-        }
-
-        static class UnknownError extends SampleError {
-
-            private Throwable error;
-
-            UnknownError(Throwable error) {
-                this.error = error;
-            }
-
-            public Throwable getError() {
-                return error;
-            }
-        }
-
-
+    private static class SampleError extends Throwable {
     }
 
-    static class SampleActionMapping implements Model.ActionMapping<SampleAction, Sample> {
-
-        @Override
-        public Sample invoke(@NotNull SampleAction sampleAction) {
-            return null;
-        }
-
-        @Override
-        public Sample invoke(@NotNull SampleAction sampleAction, @NotNull Sample sample) {
-            return null;
-        }
+    private abstract static class SampleActionMapping implements Model.ActionMapping<SampleAction, Sample> {
     }
 
-    static class SampleErrorMapping implements Resource.ErrorMapping<Sample, SampleError> {
-        @Override
-        public Resource<Sample, SampleError> invoke(Throwable error) {
-            return null;
-        }
+    private abstract static class SampleErrorMapping implements Resource.ErrorMapping<Sample, SampleError> {
     }
 
-    static class SampleResourceObserver implements Observer<Resource<Sample, SampleError>> {
-        @Override
-        public void update(@NotNull Resource<Sample, SampleError> value) {
-            System.out.println(value);
-        }
+    private abstract static class SampleResourceObserver implements Observer<Resource<Sample, SampleError>> {
     }
 }
