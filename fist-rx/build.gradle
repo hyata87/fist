@@ -2,8 +2,8 @@ plugins {
     id 'java-library'
 }
 
-group 'info.gravitypianist'
-version '1.0-SNAPSHOT'
+group "${library_group}"
+version "${library_version}"
 
 repositories {
     mavenCentral()
@@ -11,9 +11,9 @@ repositories {
 
 dependencies {
     implementation project(':fist-base')
-    implementation 'org.jetbrains:annotations:16.0.2'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.12"
+    implementation "org.jetbrains:annotations:${annotations_version}"
+    implementation "io.reactivex.rxjava2:rxjava:${rxjava2_version}"
 
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:3.0.0"
+    testImplementation "junit:junit:${junit_version}"
+    testImplementation "org.mockito:mockito-core:${mockito_core_version}"
 }

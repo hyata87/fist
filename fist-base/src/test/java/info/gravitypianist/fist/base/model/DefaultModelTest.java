@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 public class DefaultModelTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void Dispatch_SendActions_ReceivedResources() {
         SampleActionMapping actionMapping = mock(SampleActionMapping.class);
         when(actionMapping.invoke(any())).thenReturn(mock(Sample.class));

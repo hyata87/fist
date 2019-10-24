@@ -35,6 +35,7 @@ public class ModelLogicTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void Update_SendActions_ReceivedResources() {
 
         SampleActionMapping actionMapping = mock(SampleActionMapping.class);
@@ -61,6 +62,7 @@ public class ModelLogicTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void Update_SendActions_ReceivedResourceAndErrorResource() {
         SampleActionMapping actionMapping = mock(SampleActionMapping.class);
         when(actionMapping.invoke(eq(SampleAction.ACTION1), any()))
