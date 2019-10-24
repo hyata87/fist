@@ -20,4 +20,4 @@ jobs:
         GPR_USER: ${{ secrets.GPR_USER }}
         GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew build --stacktrace
+      run: ./gradlew build publish --stacktrace
